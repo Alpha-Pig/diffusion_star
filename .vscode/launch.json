@@ -1,0 +1,66 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Multi GPU: Quiet Star with Torchrun",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.run",
+            "args": [
+                "--nnodes", "1",
+                "--node_rank", "0",
+                "--nproc_per_node", "8",  // 修改这里
+                "--master_addr", "127.0.0.1",
+                "--master_port", "29501",
+                "${workspaceFolder}/main.py",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+
+        {
+            "name": "Single GPU: Quiet Star",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/quiet-star-train.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Evaluate Quiet Star",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "torch.distributed.run",
+            "args": [
+                "--nnodes", "1",
+                "--node_rank", "0",
+                "--nproc_per_node", "1",  // 修改这里
+                "--master_addr", "127.0.0.1",
+                "--master_port", "29502",
+                "${workspaceFolder}/zero-shotcot-eval.py",
+                "--batch_idx", "0",
+                "--device_batch_size", "8",
+                "--max_idx", "128",
+                "--n_votes", "8",
+                "--temp", "0.9",
+                "--start_final_answer_idx", "500",
+                "--answer_length", "12",
+                "--root_prefix", "/data_train/yeqigao/code/llms_factory/",
+                "--checkpoint", "/data_train/yeqigao/code/llms_factory/cache/star-baseline/20241203_1532/checkpoint-20",
+                "--project_title", "mistral-baseline",
+                "--final_answer_text", "Therefore, the answer (arabic numerals) is",
+                "--zero_shot_cot_prompt", "A: Let's think step by step.",
+                "--n_ahead", "8",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "WANDB_PROJECT": "quiet-star-open-web-math",
+                "WANDB_RUN_ID": "evaluate-run"
+            }
+        }
+    ]
+}
